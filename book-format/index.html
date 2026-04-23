@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hackathon Digital Reader</title>
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+  <style>
+    :root {
+      --primary-bg: #0a0a1a;
+      --accent-color: #00f2ff;
+      /* Cyber Cyan */
+      --accent-hover: #70ffff;
+      --glass-bg: rgba(10, 10, 30, 0.8);
+      --glass-border: rgba(0, 242, 255, 0.3);
+      --toolbar-height: 60px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--primary-bg) url('images/hackathon_bg.png') no-repeat center center / cover;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: white;
+    }
+
+    .main-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 320px;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .flipbook-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      height: var(--toolbar-height);
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 0 20px;
+      z-index: 100;
+    }
+
+    .btn-tool {
+      background: none;
+      border: 1px solid transparent;
+      color: #ccc;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-tool:hover {
+      color: var(--accent-color);
+      background: rgba(0, 242, 255, 0.1);
+      border-color: var(--glass-border);
+    }
+
+    .btn-tool:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+
+    .btn-tool svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .page-counter {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px 12px;
+      border-radius: 4px;
+      color: var(--accent-color);
+      min-width: 80px;
+      text-align: center;
+      border: 1px solid rgba(0, 242, 255, 0.2);
+    }
+
+    /* Search/Menu Area */
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      padding: 0 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+      z-index: 50;
+    }
+
+    .logo {
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 18px;
+      color: var(--accent-color);
+      text-transform: uppercase;
+    }
+
+    /* Flipbook styling */
+    .page {
+      background-color: transparent;
+      box-shadow: none;
+      overflow: hidden;
+    }
+
+    .page img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Mobile specific adjustments */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 10px;
+      }
+
+      .toolbar {
+        gap: 5px;
+        padding: 0 10px;
+      }
+
+      .btn-tool svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-bar">
+    <div class="logo">SPHERONIX TECHNOLOGY PVT. LTD.</div>
+    <div class="status-indicator">● LIVE HACKATHON</div>
+  </div>
+
+  <div class="main-container">
+    <div class="flipbook-container" id="flipbook-parent">
+      <div id="flipbook">
+        <!-- Pages -->
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn-tool" id="btn-first" title="First Page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polygon points="11 19 2 12 11 5 11 19"></polygon>
+        <polygon points="22 19 13 12 22 5 22 19"></polygon>
+      </svg>
+    </button>
+    <button class="btn-tool" id="btn-prev" title="Previous Page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <div class="page-counter">
+      <span id="page-current">1</span> / <span id="page-total">12</span>
+    </div>
+
+    <button class="btn-tool" id="btn-next" title="Next Page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+    <button class="btn-tool" id="btn-last" title="Last Page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polygon points="13 19 22 12 13 5 13 19"></polygon>
+        <polygon points="2 19 11 12 2 5 2 19"></polygon>
+      </svg>
+    </button>
+
+    <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.1); margin: 0 5px;"></div>
+
+    <button class="btn-tool" id="btn-fullscreen" title="Toggle Fullscreen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const pages = [
+        'images/1.png', 'images/2.png', 'images/3.png', 'images/4.png',
+        'images/5.png', 'images/6.png', 'images/7.png', 'images/8.png',
+        'images/9.png', 'images/10.png', 'images/11.png', 'images/12.png'
+      ];
+
+      const flipbookDiv = document.getElementById('flipbook');
+      pages.forEach((src) => {
+        const page = document.createElement('div');
+        page.className = 'page';
+        page.innerHTML = `<img src="${src}" alt="Page">`;
+        flipbookDiv.appendChild(page);
+      });
+
+      const pageFlip = new St.PageFlip(flipbookDiv, {
+        width: 600,
+        height: 900,
+        size: "stretch",
+        minWidth: 200,
+        minHeight: 300,
+        maxShadowOpacity: 0.5,
+        showCover: true,
+        mobileScrollSupport: false,
+        flippingTime: 1000,
+        useMouseEvents: true,
+        swipeDistance: 30,
+        mode: window.innerWidth < 1000 ? "portrait" : "landscape"
+      });
+
+      pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+      // UI Elements
+      const curPageSpan = document.getElementById('page-current');
+      const totalPageSpan = document.getElementById('page-total');
+      const btnPrev = document.getElementById('btn-prev');
+      const btnNext = document.getElementById('btn-next');
+      const btnFirst = document.getElementById('btn-first');
+      const btnLast = document.getElementById('btn-last');
+
+      totalPageSpan.innerText = pageFlip.getPageCount();
+
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+          pageFlip.flipPrev();
+        } else if (e.key === 'ArrowRight') {
+          pageFlip.flipNext();
+        }
+      });
+
+      // Navigation functions
+      btnFirst.onclick = () => pageFlip.flip(0);
+      btnPrev.onclick = () => pageFlip.flipPrev();
+      btnNext.onclick = () => pageFlip.flipNext();
+      btnLast.onclick = () => pageFlip.flip(pageFlip.getPageCount() - 1);
+
+      // Toggle Fullscreen
+      document.getElementById('btn-fullscreen').onclick = () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(e => {
+            console.error(`Error attempting to enable full-screen mode: ${e.message}`);
+          });
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+        }
+      };
+
+      // Events
+      pageFlip.on('flip', (e) => {
+        curPageSpan.innerText = e.data + 1;
+        updateButtons(e.data);
+      });
+
+      pageFlip.on('update', (e) => {
+        curPageSpan.innerText = e.data + 1;
+        updateButtons(e.data);
+      });
+
+      function updateButtons(pageIndex) {
+        btnPrev.disabled = pageIndex === 0;
+        btnFirst.disabled = pageIndex === 0;
+        btnNext.disabled = pageIndex === pageFlip.getPageCount() - 1;
+        btnLast.disabled = pageIndex === pageFlip.getPageCount() - 1;
+      }
+
+      // Initial state
+      updateButtons(0);
+
+      // Force layout recalculation on resize
+      window.addEventListener('resize', () => {
+        const newMode = window.innerWidth < 1000 ? "portrait" : "landscape";
+        if (pageFlip.getOrientation() !== newMode) {
+          pageFlip.update({ mode: newMode });
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
